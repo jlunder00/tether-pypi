@@ -38,6 +38,7 @@ jobs:
         pip install beautifulsoup4
         python .github/actions.py
     - name: Create Pull Request
+      id: cpr
       uses: peter-evans/create-pull-request@v6
       with:
         commit-message: ':package: [:robot:] Update package in PyPi index'
@@ -45,4 +46,10 @@ jobs:
         body: Automatically generated PR, updating `${{ inputs.package_name }}` in PyPi index.
         branch-suffix: random
         delete-branch: true
-        labels: automerge
+    - name: Merge Pull Request
+      if: steps.cpr.outputs.pull-request-number != ''
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+      run: |
+        gh pr merge "$PR_NUMBER" --squash --delete-branch
