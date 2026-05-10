@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       version:
-        description: New version of the package (tag name)
+        description: New version of the package (tag name, e.g. v0.0.1 or v0.0.1a1)
         required: true
         type: string
 
@@ -17,12 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Run Action
@@ -32,13 +32,13 @@ jobs:
         PKG_VERSION: ${{ inputs.version }}
       run: |
         pip install beautifulsoup4
-        python .github/actions.py 
+        python .github/actions.py
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3
+      uses: peter-evans/create-pull-request@v6
       with:
         commit-message: ':package: [:robot:] Update package in PyPi index'
         title: '[🤖] Update `${{ inputs.package_name }}` in PyPi index'
-        body: Automatically generated PR, updating `${{ inputs.package_name }}` in PyPi
-          index.
+        body: Automatically generated PR, updating `${{ inputs.package_name }}` in PyPi index.
         branch-suffix: random
         delete-branch: true
+        labels: automerge

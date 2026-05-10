@@ -1,0 +1,24 @@
+name: auto-merge
+
+# Automatically merges PRs labeled 'automerge' — used by the update and
+# register workflows so index changes land without manual review.
+
+on:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+  check_suite:
+    types: [completed]
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'github-actions[bot]'
+    steps:
+    - name: Auto-merge bot PRs labeled automerge
+      uses: pascalgn/automerge-action@v0.16.4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MERGE_LABELS: automerge
+        MERGE_METHOD: squash
+        MERGE_COMMIT_MESSAGE: pull-request-title
+        MERGE_DELETE_BRANCH: true
